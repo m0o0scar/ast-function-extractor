@@ -96,6 +96,3 @@ This will output an array of function declarations found in the code, including 
 - Handle more complex JavaScript patterns.
 - Provide options to customize the extraction process (e.g., include anonymous functions, nested functions).
 - Add support for TypeScript and other JavaScript variants.
-```
-
-This README provides an overview of how the function declaration extraction works, explains the main steps in the process, gives a usage example, and mentions some limitations and potential future improvements. You can adjust or expand this README as needed to fit your specific implementation or add more details about setup, installation, or advanced usage.
