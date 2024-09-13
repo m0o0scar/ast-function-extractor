@@ -1,98 +1,85 @@
-# JavaScript Function Declaration Extractor
+# JavaScript Function Analyzer
 
-This project provides a tool to parse JavaScript source code and extract function declarations. It uses the tree-sitter parser to analyze the abstract syntax tree (AST) of the JavaScript code and identify various types of function declarations.
+This module provides a powerful tool for analyzing JavaScript code and extracting detailed information about functions, methods, and their relationships.
 
-## How It Works
+## Features
 
-### 1. Parsing the Code
-
-We use the `tree-sitter` library along with the `tree-sitter-javascript` grammar to parse JavaScript code into an Abstract Syntax Tree (AST). This gives us a structured representation of the code that we can traverse and analyze.
-
-```javascript
-const parser = new Parser();
-parser.setLanguage(JavaScript);
-const tree = parser.parse(code);
-```
-
-### 2. Traversing the AST
-
-We recursively traverse the AST using a depth-first search approach. This allows us to examine each node in the tree and identify function declarations.
-
-### 3. Identifying Function Declarations
-
-We look for three types of function declarations:
-
-1. Function Declarations: `function foo() {}`
-2. Method Definitions: `class MyClass { myMethod() {} }`
-3. Arrow Functions: `const foo = () => {}`
-
-We identify these by checking the `type` property of each node:
-
-```javascript
-if (node.type === 'function_declaration' ||
-    node.type === 'method_definition' ||
-    node.type === 'arrow_function') {
-  // Process the function declaration
-}
-```
-
-### 4. Extracting Function Information
-
-For each function declaration, we extract:
-- The function name
-- The function signature (including parameters)
-- The start and end positions in the source code
-
-### 5. Handling Special Cases
-
-- **Class Methods**: We keep track of the current class name to properly name class methods.
-- **Anonymous Functions**: We ignore functions without names.
-- **Nested Functions**: We only extract top-level function declarations, ignoring functions defined within other functions.
-
-### 6. Returning Results
-
-We return an array of objects, each representing a function declaration with its type, name, and position in the source code.
+- Parses JavaScript code using the tree-sitter parser
+- Extracts information about functions, including:
+  - Function names
+  - Parameters
+  - Return types (inferred)
+  - Class membership (for methods)
+  - Called functions within each function
+- Handles various function types:
+  - Function declarations
+  - Arrow functions
+  - Method definitions
+  - Function expressions
+- Identifies async functions
+- Detects nested functions (and excludes them from the output)
+- Tracks class instances and their method calls
 
 ## Usage
 
 ```javascript
-import { getFunctionDeclarations } from './functionExtractor.js';
+import { analyzeFunctions } from './path-to-module/index.mjs';
 
 const code = `
-function hello() {
+// Your JavaScript code here
+`;
+
+const functionInfo = analyzeFunctions(code);
+console.log(JSON.stringify(functionInfo, null, 2));
+```
+
+## Output
+
+The `analyzeFunctions` function returns an array of objects, each representing a function or method in the analyzed code. Each object may contain the following properties:
+
+- `name`: The name of the function
+- `parameters`: The parameters of the function as a string
+- `returnType`: The inferred return type of the function
+- `class`: (Optional) The name of the class if the function is a method
+- `call`: (Optional) An array of function names called within this function
+
+## Dependencies
+
+- `tree-sitter`: For parsing JavaScript code
+- `tree-sitter-javascript`: Grammar for JavaScript parsing
+
+## Limitations
+
+- Return type inference is basic and may not accurately reflect complex types
+- Nested functions are not included in the output
+- Some complex JavaScript patterns may not be fully captured
+
+## Example
+
+```javascript
+const code = `
+async function hello() {
   console.log('Hello, world!');
 }
 
 const greet = (name) => {
+  hello();
   console.log('Hello, ' + name + '!');
 };
 
 class MyClass {
-  method() {
+  method(a, b) {
     console.log('Method called');
   }
 }
 `;
 
-const result = getFunctionDeclarations(code);
-console.log(result);
+const result = analyzeFunctions(code);
+console.log(JSON.stringify(result, null, 2));
 ```
 
-This will output an array of function declarations found in the code, including their names, types, and positions.
+This will output detailed information about the functions in the provided code.
 
-## Limitations
+## Contributing
 
-- The extractor does not handle every possible edge case in JavaScript syntax.
-- It does not extract functions from more complex patterns, such as functions returned from other functions.
-- It does not analyze the content or behavior of the functions, only their declarations.
-
-## Dependencies
-
-- `tree-sitter`: For parsing JavaScript code into an AST.
-- `tree-sitter-javascript`: Provides the JavaScript grammar for tree-sitter.
-
-## Future Improvements
-
-- Handle more complex JavaScript patterns.
-- Provide options to customize the extraction process (e.g., include anonymous functions, nested functions).
-- Add support for TypeScript and other JavaScript variants.
+Contributions to improve the function analysis or add new features are welcome. Please submit issues and pull requests on the project's repository.
